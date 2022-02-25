@@ -135,7 +135,7 @@ describe('Vaults', function () {
     });
   });
   describe('Vault Tests', function () {
-    it('should allow deposits and account for them correctly', async function () {
+    xit('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const vaultBalance = await vault.balance();
@@ -155,19 +155,19 @@ describe('Vaults', function () {
       console.log('---------------------------------------------');
       const userBalance = await want.balanceOf(selfAddress);
       console.log(userBalance.toString());
-      const selfDepositAmount = toWantUnit('0.0007');
+      const selfDepositAmount = toWantUnit('10');
       console.log(selfDepositAmount);
       await vault.connect(self).deposit(selfDepositAmount);
       console.log((await vault.balance()).toString());
 
       const whaleBalance = await want.connect(wantWhale).balanceOf(selfAddress);
       console.log(`whaleBalance: ${whaleBalance.toString()}`);
-      const whaleDepositAmount = toWantUnit('0.001');
+      const whaleDepositAmount = toWantUnit('100');
       console.log(`whaleDepositAmount: ${whaleDepositAmount}`);
       await vault.connect(wantWhale).deposit(whaleDepositAmount);
       const selfWantBalance = await vault.balanceOf(selfAddress);
       console.log(selfWantBalance.toString());
-      const ownerDepositAmount = toWantUnit('0.0001');
+      const ownerDepositAmount = toWantUnit('0.1');
       await want.connect(self).transfer(ownerAddress, ownerDepositAmount);
       const ownerBalance = await want.balanceOf(ownerAddress);
 
@@ -182,16 +182,14 @@ describe('Vaults', function () {
       const ownerVaultWantBalanceAfterWithdraw = await vault.balanceOf(ownerAddress);
       console.log(`ownerVaultWantBalanceAfterWithdraw: ${ownerVaultWantBalanceAfterWithdraw}`);
       const allowedImprecision = toWantUnit('0.0001');
-      const ownerDepositFee = (ownerDepositAmount * 10) / 10000;
-      expect(ownerWantBalance).to.be.closeTo(ownerDepositAmount.sub(ownerDepositFee), allowedImprecision);
-      const selfDepositFee = (selfDepositAmount * 10) / 10000;
-      expect(selfWantBalance).to.equal(selfDepositAmount - selfDepositFee);
+      expect(ownerWantBalance).to.be.closeTo(ownerDepositAmount, allowedImprecision);
+      expect(selfWantBalance).to.equal(selfDepositAmount);
     });
 
     xit('should allow withdrawals', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
-      const depositAmount = toWantUnit('0.0007');
+      const depositAmount = toWantUnit('100');
       await vault.connect(self).deposit(depositAmount);
       console.log(`await want.balanceOf(selfAddress): ${await want.balanceOf(selfAddress)}`);
 
@@ -200,19 +198,17 @@ describe('Vaults', function () {
       console.log(`newUserVaultBalance: ${newUserVaultBalance}`);
       const userBalanceAfterWithdraw = await want.balanceOf(selfAddress);
       const securityFee = 10;
-      const depositFee = 10;
       const percentDivisor = 10000;
-      const withdrawFee = (depositAmount * securityFee) / percentDivisor;
-      const depositFeePayed = (depositAmount * depositFee) / percentDivisor;
-      const expectedBalance = userBalance.sub(withdrawFee).sub(depositFeePayed);
-      const smallDifference = expectedBalance * 0.002;
+      const withdrawFee = depositAmount.mul(securityFee).div(percentDivisor);
+      const expectedBalance = userBalance.sub(withdrawFee);
+      const smallDifference = expectedBalance.div(200);
       console.log(`expectedBalance.sub(userBalanceAfterWithdraw): ${expectedBalance.sub(userBalanceAfterWithdraw)}`);
       console.log(`smallDifference: ${smallDifference}`);
       const isSmallBalanceDifference = expectedBalance.sub(userBalanceAfterWithdraw) < smallDifference;
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('should allow small withdrawal', async function () {
+    it('should allow small withdrawal', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const depositAmount = toWantUnit('0.0000001');

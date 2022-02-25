@@ -96,19 +96,19 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * The available {want} minus fees is returned to the vault.
      */
     function withdraw(uint _withdrawAmount) external {
-        // uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
+        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
 
-        // if (wantBalance < _withdrawAmount) {
-        //     IMasterChef(MASTER_CHEF).withdraw(poolId, _withdrawAmount - wantBalance);
-        //     wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        // }
+        if (wantBalance < _withdrawAmount) {
+            ILpDepositor(LP_DEPOSITOR).withdraw(want, _withdrawAmount - wantBalance);
+            wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
+        }
 
-        // if (wantBalance > _withdrawAmount) {
-        //     wantBalance = _withdrawAmount;
-        // }
+        if (wantBalance > _withdrawAmount) {
+            wantBalance = _withdrawAmount;
+        }
 
-        // uint withdrawFee = _withdrawAmount * securityFee / PERCENT_DIVISOR;
-        // IERC20Upgradeable(want).safeTransfer(vault, wantBalance - withdrawFee);
+        uint withdrawFee = _withdrawAmount * securityFee / PERCENT_DIVISOR;
+        IERC20Upgradeable(want).safeTransfer(vault, wantBalance - withdrawFee);
     }
 
     /**
