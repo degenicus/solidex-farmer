@@ -208,7 +208,7 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    it('should allow small withdrawal', async function () {
+    xit('should allow small withdrawal', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const depositAmount = toWantUnit('0.0000001');
@@ -243,11 +243,9 @@ describe('Vaults', function () {
       await vault.connect(self).deposit(depositAmount);
       console.log(`await want.balanceOf(selfAddress): ${await want.balanceOf(selfAddress)}`);
 
-      const depositFee = 10;
       const percentDivisor = 10000;
-      const depositFeePayed = (depositAmount * depositFee) / percentDivisor;
 
-      await vault.connect(self).withdraw(depositAmount.sub(depositFeePayed));
+      await vault.connect(self).withdraw(depositAmount);
       console.log(`await want.balanceOf(selfAddress): ${await want.balanceOf(selfAddress)}`);
       const newUserVaultBalance = await vault.balanceOf(selfAddress);
       console.log(`newUserVaultBalance: ${newUserVaultBalance}`);
@@ -256,15 +254,15 @@ describe('Vaults', function () {
       const securityFee = 10;
       const withdrawFee = (depositAmount * securityFee) / percentDivisor;
 
-      const expectedBalance = userBalance.sub(withdrawFee).sub(depositFeePayed);
+      const expectedBalance = userBalance.sub(withdrawFee);
       const isSmallBalanceDifference = expectedBalance.sub(userBalanceAfterWithdraw) < 200;
       console.log(`expectedBalance: ${expectedBalance}`);
       console.log(`userBalanceAfterWithdraw: ${userBalanceAfterWithdraw}`);
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('should be able to harvest', async function () {
-      await vault.connect(self).deposit(toWantUnit(1000, true));
+    it('should be able to harvest', async function () {
+      await vault.connect(self).deposit(toWantUnit('1000'));
       const estimatedGas = await strategy.estimateGas.harvest();
       console.log(`estimatedGas: ${estimatedGas}`);
       await strategy.connect(self).harvest();

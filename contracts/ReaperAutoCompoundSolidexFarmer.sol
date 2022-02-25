@@ -2,6 +2,7 @@
 
 import './abstract/ReaperBaseStrategy.sol';
 import './interfaces/ILpDepositor.sol';
+import './interfaces/IBaseV1Router01.sol';
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 import 'hardhat/console.sol';
@@ -187,9 +188,9 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         console.log('deposit()');
         uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
         console.log('wantBalance: ', wantBalance);
-        ILpDepositor(LP_DEPOSITOR).deposit(want, wantBalance);
-        wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        console.log('wantBalance: ', wantBalance);
+        if (wantBalance != 0) {
+            ILpDepositor(LP_DEPOSITOR).deposit(want, wantBalance);
+        }
     }
 
     /**
@@ -241,7 +242,9 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * Get rewards from the MasterChef
      */
     function _claimRewards() internal {
-        // IMasterChef(MASTER_CHEF).deposit(poolId, 0);
+        address[] memory pools = new address[](1);
+        pools[0] = want;
+        ILpDepositor(LP_DEPOSITOR).getReward(pools);
     }
 
     /**
@@ -249,16 +252,22 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * Swaps {PROTO} to {WFTM}
      */
     function _swapRewardsToWftm() internal {
-        // uint protoBalance = IERC20Upgradeable(PROTO).balanceOf(address(this));
-        // if (protoBalance >= minProtoToSell) {
-        //     IUniswapRouter(PROTOFI_ROUTER).swapExactTokensForTokensSupportingFeeOnTransferTokens(
-        //         protoBalance,
-        //         0,
-        //         protoToWftmRoute,
-        //         address(this),
-        //         block.timestamp
-        //     );
-        // }
+        _swapTokens(SOLIDLY, WFTM);
+        _swapTokens(SOLIDEX, WFTM);
+    }
+
+    function _swapTokens(address _from, address _to) internal {
+        uint fromBalance = IERC20Upgradeable(_from).balanceOf(address(this));
+        if (fromBalance != 0) {
+            IBaseV1Router01.route memory route = IBaseV1Router01.route({
+                from: _from, 
+                to: _to,
+                stable: false
+            });
+            IBaseV1Router01.route[] memory routes = new IBaseV1Router01.route[](1);
+            routes[0] = route;
+            IBaseV1Router01(SOLIDLY_ROUTER).swapExactTokensForTokens(fromBalance, 0, routes, address(this), block.timestamp);
+        }
     }
 
     /**
@@ -331,11 +340,16 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
             LP_DEPOSITOR,
             wantAllowance
         );
-        // uint protoAllowance = type(uint).max - IERC20Upgradeable(PROTO).allowance(address(this), PROTOFI_ROUTER);
-        // IERC20Upgradeable(PROTO).safeIncreaseAllowance(
-        //     PROTOFI_ROUTER,
-        //     protoAllowance
-        // );
+        uint solidlyAllowance = type(uint).max - IERC20Upgradeable(SOLIDLY).allowance(address(this), SOLIDLY_ROUTER);
+        IERC20Upgradeable(SOLIDLY).safeIncreaseAllowance(
+            SOLIDLY_ROUTER,
+            solidlyAllowance
+        );
+        uint solidexAllowance = type(uint).max - IERC20Upgradeable(SOLIDEX).allowance(address(this), SOLIDLY_ROUTER);
+        IERC20Upgradeable(SOLIDEX).safeIncreaseAllowance(
+            SOLIDLY_ROUTER,
+            solidexAllowance
+        );
         // uint wftmAllowance = type(uint).max - IERC20Upgradeable(WFTM).allowance(address(this), PROTOFI_ROUTER);
         // IERC20Upgradeable(WFTM).safeIncreaseAllowance(
         //     PROTOFI_ROUTER,
@@ -358,7 +372,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function _removeAllowances() internal {
         IERC20Upgradeable(want).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(want).allowance(address(this), LP_DEPOSITOR));
-        // IERC20Upgradeable(PROTO).safeDecreaseAllowance(PROTOFI_ROUTER, IERC20Upgradeable(PROTO).allowance(address(this), PROTOFI_ROUTER));
+        IERC20Upgradeable(SOLIDLY).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDLY).allowance(address(this), LP_DEPOSITOR));
+        IERC20Upgradeable(SOLIDEX).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDEX).allowance(address(this), LP_DEPOSITOR));
         // IERC20Upgradeable(WFTM).safeDecreaseAllowance(PROTOFI_ROUTER, IERC20Upgradeable(WFTM).allowance(address(this), PROTOFI_ROUTER));
         // IERC20Upgradeable(lpToken0).safeDecreaseAllowance(PROTOFI_ROUTER, IERC20Upgradeable(lpToken0).allowance(address(this), PROTOFI_ROUTER));
         // IERC20Upgradeable(lpToken1).safeDecreaseAllowance(PROTOFI_ROUTER, IERC20Upgradeable(lpToken1).allowance(address(this), PROTOFI_ROUTER));
