@@ -20,4 +20,17 @@ interface IBaseV1Router01 {
         uint deadline
     ) external;
 
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        bool stable,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external;
+
+    function getAmountsOut(uint amountIn, route[] memory routes) external view returns (uint[] memory amounts);
 }

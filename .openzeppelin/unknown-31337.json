@@ -3,14 +3,14 @@
   "proxies": [
     {
       "address": "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
-      "txHash": "0xac5f6556bc223930af9609dfe16b85532758fc42bf927dbdaec7d36e51661686",
+      "txHash": "0x23bc36879d8d6eedcbc7587b920426e7f3d21b4a84cef0d7ff3dd221d4cac60c",
       "kind": "uups"
     }
   ],
   "impls": {
-    "908ef1b5421ecb8b55e8f26826c8bde47a3d55f4ac98c047836c015707337ba9": {
+    "880533093527409c42086948836cbab720e7933d8a5eb41e54e8a16b2d7bead0": {
       "address": "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
-      "txHash": "0x78353dc86e3fb7520baf914dac6c6e707fc4d4bdca671bc6f9ee93f942cf24f8",
+      "txHash": "0x38d3170667810e152806e149d9a3c4564b5171597584459710018e00bc0b3f6d",
       "layout": {
         "storage": [
           {
@@ -88,7 +88,7 @@
           {
             "contract": "ReaperBaseStrategy",
             "label": "harvestLog",
-            "type": "t_array(t_struct(Harvest)6470_storage)dyn_storage",
+            "type": "t_array(t_struct(Harvest)6935_storage)dyn_storage",
             "src": "contracts\\abstract\\ReaperBaseStrategy.sol:27"
           },
           {
@@ -161,55 +161,49 @@
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "want",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:30"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:31"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "lpToken0",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:31"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:32"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "lpToken1",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:32"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:33"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "solidlyToWftmRoute",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:50"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:51"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "solidexToWftmRoute",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:51"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:52"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "wftmToWantRoute",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:52"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:53"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "wftmToLp0Route",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:53"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:54"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "wftmToLp1Route",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:54"
-          },
-          {
-            "contract": "ReaperAutoCompoundSolidexFarmer",
-            "label": "minProtoToSell",
-            "type": "t_uint256",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:66"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:55"
           }
         ],
         "types": {
@@ -219,13 +213,10 @@
           "t_array(t_address)dyn_storage": {
             "label": "address[]"
           },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_array(t_struct(Harvest)6470_storage)dyn_storage": {
+          "t_array(t_struct(Harvest)6935_storage)dyn_storage": {
             "label": "struct ReaperBaseStrategy.Harvest[]"
           },
-          "t_struct(Harvest)6470_storage": {
+          "t_struct(Harvest)6935_storage": {
             "label": "struct ReaperBaseStrategy.Harvest",
             "members": [
               {
@@ -237,6 +228,9 @@
                 "type": "t_uint256"
               }
             ]
+          },
+          "t_uint256": {
+            "label": "uint256"
           },
           "t_bool": {
             "label": "bool"

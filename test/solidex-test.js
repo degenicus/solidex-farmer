@@ -261,7 +261,7 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    it('should be able to harvest', async function () {
+    xit('should be able to harvest', async function () {
       await vault.connect(self).deposit(toWantUnit('1000'));
       const estimatedGas = await strategy.estimateGas.harvest();
       console.log(`estimatedGas: ${estimatedGas}`);
@@ -269,7 +269,7 @@ describe('Vaults', function () {
     });
 
     xit('should provide yield', async function () {
-      const timeToSkip = 36000000;
+      const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(selfAddress);
       console.log(initialUserBalance);
       const depositAmount = initialUserBalance.div(1);
@@ -279,7 +279,7 @@ describe('Vaults', function () {
 
       await strategy.updateHarvestLogCadence(timeToSkip / 2);
 
-      const numHarvests = 10;
+      const numHarvests = 5;
       for (let i = 0; i < numHarvests; i++) {
         await moveTimeForward(timeToSkip);
         //await vault.connect(self).deposit(depositAmount);
@@ -298,7 +298,7 @@ describe('Vaults', function () {
   describe('Strategy', function () {
     xit('should be able to pause and unpause', async function () {
       await strategy.pause();
-      const depositAmount = toWantUnit('0.0007');
+      const depositAmount = toWantUnit('1');
       await expect(vault.connect(self).deposit(depositAmount)).to.be.reverted;
       await strategy.unpause();
       await expect(vault.connect(self).deposit(depositAmount)).to.not.be.reverted;
@@ -334,8 +334,8 @@ describe('Vaults', function () {
       await expect(strategy.retireStrat()).to.not.be.reverted;
     });
 
-    xit('should be able to estimate harvest', async function () {
-      const whaleDepositAmount = toWantUnit('0.001');
+    it('should be able to estimate harvest', async function () {
+      const whaleDepositAmount = toWantUnit('1000');
       await vault.connect(wantWhale).deposit(whaleDepositAmount);
       const minute = 60;
       const hour = 60 * minute;
