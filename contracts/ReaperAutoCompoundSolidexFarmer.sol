@@ -42,7 +42,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /**
      * @dev Routes we take to swap tokens
-     * {protoToWftmRoute} - Route we take to get from {SOLIDLY} into {WFTM}.
+     * {solidlyToWftmRoute} - Route we take to get from {SOLIDLY} into {WFTM}.
      * {solidexToWftmRoute} - Route we take to get from {SOLIDEX} into {WFTM}.
      * {wftmToWantRoute} - Route we take to get from {WFTM} into {want}.
      * {wftmToLp0Route} - Route we take to get from {WFTM} into {lpToken0}.
@@ -141,7 +141,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     }
 
     /**
-     * @dev Pauses supplied. Withdraws all funds from the ProtoFi MasterChef, leaving rewards behind.
+     * @dev Pauses supplied. Withdraws all funds from the LP Depositor, leaving rewards behind.
      */
     function panic() external {
         _onlyStrategistOrOwner();
@@ -175,7 +175,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     /**
      * @dev Function that puts the funds to work.
      * It gets called whenever someone supplied in the strategy's vault contract.
-     * It supplies {want} to farm {PROTO}
+     * It supplies {want} to farm {SOLIDLY} and {SOLIDEX}
      */
     function deposit() public whenNotPaused {
         console.log('deposit()');
@@ -216,8 +216,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /**
      * @dev Core function of the strat, in charge of collecting and re-investing rewards.
-     * 1. Claims {PROTO} from the MasterChef.
-     * 2. Swaps {PROTO} to {WFTM}.
+     * 1. Claims {SOLIDLY} and {SOLIDEX} from the MasterChef.
+     * 2. Swaps rewards to {WFTM}.
      * 3. Claims fees for the harvest caller and treasury.
      * 4. Swaps the {WFTM} token for {want}
      * 5. Deposits.
@@ -242,7 +242,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /**
      * @dev Core harvest function.
-     * Swaps {PROTO} to {WFTM}
+     * Swaps {SOLIDLY} and {SOLIDEX} to {WFTM}
      */
     function _swapRewardsToWftm() internal {
         uint solidlyBalance = IERC20Upgradeable(SOLIDLY).balanceOf(address(this));
