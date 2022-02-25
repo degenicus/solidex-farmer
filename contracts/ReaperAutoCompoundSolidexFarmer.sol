@@ -133,22 +133,22 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * Note: this is not an emergency withdraw function. For that, see panic().
      */
     function retireStrat() external {
-        // _onlyStrategistOrOwner();
-        // _harvestCore();
-        // IMasterChef(MASTER_CHEF).withdraw(poolId, balanceOfPool());
-        // uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        // IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
+        _onlyStrategistOrOwner();
+        _harvestCore();
+        ILpDepositor(LP_DEPOSITOR).withdraw(want, balanceOfPool());
+        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
+        IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
     }
 
     /**
      * @dev Pauses supplied. Withdraws all funds from the ProtoFi MasterChef, leaving rewards behind.
      */
     function panic() external {
-        // _onlyStrategistOrOwner();
-        // IMasterChef(MASTER_CHEF).emergencyWithdraw(poolId);
-        // uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        // IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
-        // pause();
+        _onlyStrategistOrOwner();
+        ILpDepositor(LP_DEPOSITOR).withdraw(want, balanceOfPool());
+        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
+        IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
+        pause();
     }
 
     /**
