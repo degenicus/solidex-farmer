@@ -270,7 +270,7 @@ describe('Vaults', function () {
       await strategy.connect(self).harvest();
     });
 
-    it('should provide yield', async function () {
+    xit('should provide yield', async function () {
       const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(selfAddress);
       console.log(initialUserBalance);
@@ -319,7 +319,7 @@ describe('Vaults', function () {
     });
 
     xit('should be able to retire strategy', async function () {
-      const depositAmount = toWantUnit('0.0007');
+      const depositAmount = toWantUnit('100');
       await vault.connect(self).deposit(depositAmount);
       const vaultBalance = await vault.balance();
       const strategyBalance = await strategy.balanceOf();
@@ -327,12 +327,12 @@ describe('Vaults', function () {
       await expect(strategy.retireStrat()).to.not.be.reverted;
       const newVaultBalance = await vault.balance();
       const newStrategyBalance = await strategy.balanceOf();
-      const allowedImprecision = toWantUnit('0.000000001');
+      const allowedImprecision = toWantUnit('0.001');
       expect(newVaultBalance).to.be.closeTo(vaultBalance, allowedImprecision);
       expect(newStrategyBalance).to.be.lt(allowedImprecision);
     });
 
-    xit('should be able to retire strategy with no balance', async function () {
+    it('should be able to retire strategy with no balance', async function () {
       await expect(strategy.retireStrat()).to.not.be.reverted;
     });
 
