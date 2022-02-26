@@ -6,8 +6,6 @@ import './interfaces/IBaseV1Router01.sol';
 import './interfaces/IBaseV1Pair.sol';
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-import 'hardhat/console.sol';
-
 pragma solidity 0.8.11;
 
 /**
@@ -114,21 +112,16 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      *      Profit is denominated in WFTM, and takes fees into account.
      */
     function estimateHarvest() external view override returns (uint profit, uint callFeeToUser) {
-        console.log('estimateHarvest()');
         address[] memory pools = new address[](1);
         pools[0] = want;
         ILpDepositor.Amounts[] memory pendingRewards = ILpDepositor(LP_DEPOSITOR).pendingRewards(address(this), pools);
         ILpDepositor.Amounts memory pending = pendingRewards[0];
-        console.log('solidlyReward: ', pending.solid);
-        console.log('solidexReward: ', pending.sex);
 
         IBaseV1Router01.route[] memory solidlyRoutes = _getRoutes(SOLIDLY, WFTM);
         uint solidlyWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidlyRoutes)[0];
-        console.log('solidlyWftmAmount: ', solidlyWftmAmount);
 
         IBaseV1Router01.route[] memory solidexRoutes = _getRoutes(SOLIDEX, WFTM);
         uint solidexWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidexRoutes)[0];
-        console.log('solidexWftmAmount: ', solidexWftmAmount);
 
         profit = solidlyWftmAmount + solidexWftmAmount;
         uint wftmFee = (profit * totalFee) / PERCENT_DIVISOR;
@@ -192,9 +185,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * It supplies {want} to farm {SOLIDLY} and {SOLIDEX}
      */
     function deposit() public whenNotPaused {
-        console.log('deposit()');
         uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        console.log('wantBalance: ', wantBalance);
         if (wantBalance != 0) {
             ILpDepositor(LP_DEPOSITOR).deposit(want, wantBalance);
         }
@@ -212,9 +203,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the total amount of {want} held in the Solidex LP Depositor
      */
     function balanceOfPool() public view returns (uint) {
-        console.log('balanceOfPool()');
         uint poolBalance = ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
-        console.log('poolBalance: ', poolBalance);
         return ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
     }
 
@@ -222,9 +211,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the balance of want held directly by the strategy
      */
     function balanceOfWant() public view returns (uint) {
-        console.log('balanceOfPool()');
         uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        console.log('wantBalance: ', wantBalance);
         return IERC20Upgradeable(want).balanceOf(address(this));
     }
 
@@ -303,7 +290,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /** @dev Converts WFTM to both sides of the LP token and builds the liquidity pair */
     function _addLiquidity() internal {
-        console.log('_addLiquidity()');
         uint wrappedHalf = IERC20Upgradeable(WFTM).balanceOf(address(this)) / 2;
         if (wrappedHalf == 0) {
             return;
@@ -318,8 +304,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
         uint lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
-        console.log('lp0Bal: ', lp0Bal);
-        console.log('lp1Bal: ', lp1Bal);
 
         IBaseV1Router01(SOLIDLY_ROUTER).addLiquidity(lpToken0, lpToken1, false, lp0Bal, lp1Bal, 0, 0, address(this), block.timestamp);
     }
