@@ -55,6 +55,12 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     address[] public wftmToLp1Route;
 
     /**
+     * @dev Strategy variables
+     * {isStable} - If the LP are stables (uses different swap)
+    */
+    bool public isStable;
+
+    /**
      * @dev Initializes the strategy. Sets parameters, saves routes, and gives allowances.
      * @notice see documentation for each variable above its respective declaration.
      */
@@ -62,7 +68,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         address _vault,
         address[] memory _feeRemitters,
         address[] memory _strategists,
-        address _want
+        address _want,
+        bool _isStable
     ) public initializer {
         __ReaperBaseStrategy_init(_vault, _feeRemitters, _strategists);
         want = _want;
@@ -73,6 +80,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
         wftmToLp0Route = [WFTM, lpToken0];
         wftmToLp1Route = [WFTM, lpToken1];
+
+        isStable = _isStable;
 
         _giveAllowances();
     }
@@ -262,7 +271,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IBaseV1Router01.route memory route = IBaseV1Router01.route({
             from: _from, 
             to: _to,
-            stable: false
+            stable: isStable
         });
         IBaseV1Router01.route[] memory routes = new IBaseV1Router01.route[](1);
         routes[0] = route;
