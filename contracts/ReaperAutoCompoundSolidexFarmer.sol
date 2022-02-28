@@ -283,7 +283,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         uint lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
 
-        IBaseV1Router01(SOLIDLY_ROUTER).addLiquidity(lpToken0, lpToken1, false, lp0Bal, lp1Bal, 0, 0, address(this), block.timestamp);
+        IBaseV1Router01(SOLIDLY_ROUTER).addLiquidity(lpToken0, lpToken1, isStable, lp0Bal, lp1Bal, 0, 0, address(this), block.timestamp);
     }
 
     /**
