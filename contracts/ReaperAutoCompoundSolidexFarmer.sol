@@ -142,9 +142,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     function unpause() external {
         _onlyStrategistOrOwner();
         _unpause();
-
         _giveAllowances();
-
         deposit();
     }
 
@@ -181,7 +179,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the total amount of {want} held in the Solidex LP Depositor
      */
     function balanceOfPool() public view returns (uint) {
-        uint poolBalance = ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
         return ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
     }
 
@@ -189,7 +186,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the balance of want held directly by the strategy
      */
     function balanceOfWant() public view returns (uint) {
-        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
         return IERC20Upgradeable(want).balanceOf(address(this));
     }
 
