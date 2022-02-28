@@ -96,12 +96,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         ILpDepositor.Amounts memory pending = pendingRewards[0];
 
         IBaseV1Router01.route[] memory solidlyRoutes = _getRoutes(SOLIDLY, WFTM);
-        uint solidlyWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidlyRoutes)[0];
+        profit += IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidlyRoutes)[1];
 
         IBaseV1Router01.route[] memory solidexRoutes = _getRoutes(SOLIDEX, WFTM);
-        uint solidexWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidexRoutes)[0];
+        profit += IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.sex, solidexRoutes)[1];
 
-        profit = solidlyWftmAmount + solidexWftmAmount;
         uint wftmFee = (profit * totalFee) / PERCENT_DIVISOR;
         callFeeToUser = (wftmFee * callFee) / PERCENT_DIVISOR;
         profit -= wftmFee;
