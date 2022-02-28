@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 
 async function main() {
-  const vaultAddress = '';
+  const vaultAddress = '0xbe722905A81749DC99CCf7335F1B70ae6a3E9089';
 
   const Strategy = await ethers.getContractFactory('ReaperAutoCompoundSolidexFarmer');
   const treasuryAddress = '0x0e7c5313E9BB80b654734d9b7aB1FB01468deE3b';
@@ -13,7 +13,7 @@ async function main() {
   const wantAddress = ftmTombLPAddress;
   const isStable = false;
 
-  // const options = { gasPrice: 2000000000000, gasLimit: 9000000 };
+  const options = { gasPrice: 2000000000000, gasLimit: 9000000 };
 
   const strategy = await hre.upgrades.deployProxy(
     Strategy,
@@ -25,6 +25,7 @@ async function main() {
       isStable,
     ],
     { kind: 'uups' },
+    options,
   );
   await strategy.deployed();
   console.log('Strategy deployed to:', strategy.address);
