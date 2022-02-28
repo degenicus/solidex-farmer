@@ -271,10 +271,10 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         }
 
         if (lpToken0 != WFTM) {
-            _swapTokens(lpToken0, WFTM, wrappedHalf);
+            _swapTokens(WFTM, lpToken0, wrappedHalf);
         }
         if (lpToken1 != WFTM) {
-            _swapTokens(lpToken1, WFTM, wrappedHalf);
+            _swapTokens(WFTM, lpToken1, wrappedHalf);
         }
 
         uint lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
