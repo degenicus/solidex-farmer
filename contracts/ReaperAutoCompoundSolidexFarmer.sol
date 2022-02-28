@@ -116,7 +116,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function retireStrat() external {
         _onlyStrategistOrOwner();
-        _harvestCore();
+
+        _claimRewards();
+        _swapRewardsToWftm();
+        _addLiquidity();
+
         uint poolBalance = balanceOfPool();
         if (poolBalance != 0) {
             ILpDepositor(LP_DEPOSITOR).withdraw(want, poolBalance);
