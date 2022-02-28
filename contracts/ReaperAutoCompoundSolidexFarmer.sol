@@ -39,20 +39,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     address public constant SOLIDLY_ROUTER = 0xa38cd27185a464914D3046f0AB9d43356B34829D;
 
     /**
-     * @dev Routes we take to swap tokens
-     * {solidlyToWftmRoute} - Route we take to get from {SOLIDLY} into {WFTM}.
-     * {solidexToWftmRoute} - Route we take to get from {SOLIDEX} into {WFTM}.
-     * {wftmToWantRoute} - Route we take to get from {WFTM} into {want}.
-     * {wftmToLp0Route} - Route we take to get from {WFTM} into {lpToken0}.
-     * {wftmToLp1Route} - Route we take to get from {WFTM} into {lpToken1}.
-     */
-    address[] public solidlyToWftmRoute;
-    address[] public solidexToWftmRoute;
-    address[] public wftmToWantRoute;
-    address[] public wftmToLp0Route;
-    address[] public wftmToLp1Route;
-
-    /**
      * @dev Strategy variables
      * {isStable} - If the LP are stables (uses different swap)
     */
@@ -71,16 +57,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     ) public initializer {
         __ReaperBaseStrategy_init(_vault, _feeRemitters, _strategists);
         want = _want;
-        solidlyToWftmRoute = [SOLIDLY, WFTM];
-        solidexToWftmRoute = [SOLIDEX, WFTM];
-        
         (lpToken0, lpToken1) = IBaseV1Pair(want).tokens();
-
-        wftmToLp0Route = [WFTM, lpToken0];
-        wftmToLp1Route = [WFTM, lpToken1];
-
         isStable = _isStable;
-
         _giveAllowances();
     }
 
@@ -118,12 +96,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         ILpDepositor.Amounts memory pending = pendingRewards[0];
 
         IBaseV1Router01.route[] memory solidlyRoutes = _getRoutes(SOLIDLY, WFTM);
-        uint solidlyWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidlyRoutes)[0];
+        profit += IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidlyRoutes)[1];
 
         IBaseV1Router01.route[] memory solidexRoutes = _getRoutes(SOLIDEX, WFTM);
-        uint solidexWftmAmount = IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.solid, solidexRoutes)[0];
+        profit += IBaseV1Router01(SOLIDLY_ROUTER).getAmountsOut(pending.sex, solidexRoutes)[1];
 
-        profit = solidlyWftmAmount + solidexWftmAmount;
         uint wftmFee = (profit * totalFee) / PERCENT_DIVISOR;
         callFeeToUser = (wftmFee * callFee) / PERCENT_DIVISOR;
         profit -= wftmFee;
@@ -138,7 +115,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function retireStrat() external {
         _onlyStrategistOrOwner();
-        _harvestCore();
+
+        _claimRewards();
+        _swapRewardsToWftm();
+        _addLiquidity();
+
         uint poolBalance = balanceOfPool();
         if (poolBalance != 0) {
             ILpDepositor(LP_DEPOSITOR).withdraw(want, poolBalance);
@@ -153,8 +134,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     function panic() external {
         _onlyStrategistOrOwner();
         ILpDepositor(LP_DEPOSITOR).withdraw(want, balanceOfPool());
-        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
         pause();
     }
 
@@ -164,9 +143,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     function unpause() external {
         _onlyStrategistOrOwner();
         _unpause();
-
         _giveAllowances();
-
         deposit();
     }
 
@@ -203,7 +180,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the total amount of {want} held in the Solidex LP Depositor
      */
     function balanceOfPool() public view returns (uint) {
-        uint poolBalance = ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
         return ILpDepositor(LP_DEPOSITOR).userBalances(address(this), want);
     }
 
@@ -211,7 +187,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      * @dev Calculates the balance of want held directly by the strategy
      */
     function balanceOfWant() public view returns (uint) {
-        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
         return IERC20Upgradeable(want).balanceOf(address(this));
     }
 
@@ -296,16 +271,16 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         }
 
         if (lpToken0 != WFTM) {
-            _swapTokens(wftmToLp0Route[0], wftmToLp0Route[1], wrappedHalf);
+            _swapTokens(WFTM, lpToken0, wrappedHalf);
         }
         if (lpToken1 != WFTM) {
-            _swapTokens(wftmToLp1Route[0], wftmToLp1Route[1], wrappedHalf);
+            _swapTokens(WFTM, lpToken1, wrappedHalf);
         }
 
         uint lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
 
-        IBaseV1Router01(SOLIDLY_ROUTER).addLiquidity(lpToken0, lpToken1, false, lp0Bal, lp1Bal, 0, 0, address(this), block.timestamp);
+        IBaseV1Router01(SOLIDLY_ROUTER).addLiquidity(lpToken0, lpToken1, isStable, lp0Bal, lp1Bal, 0, 0, address(this), block.timestamp);
     }
 
     /**
@@ -349,9 +324,9 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function _removeAllowances() internal {
         IERC20Upgradeable(want).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(want).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(SOLIDLY).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDLY).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(SOLIDEX).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDEX).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(WFTM).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(WFTM).allowance(address(this), LP_DEPOSITOR));
+        IERC20Upgradeable(SOLIDLY).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(SOLIDLY).allowance(address(this), SOLIDLY_ROUTER));
+        IERC20Upgradeable(SOLIDEX).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(SOLIDEX).allowance(address(this), SOLIDLY_ROUTER));
+        IERC20Upgradeable(WFTM).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(WFTM).allowance(address(this), SOLIDLY_ROUTER));
         IERC20Upgradeable(lpToken0).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER));
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER));
     }
