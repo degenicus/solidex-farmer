@@ -131,8 +131,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     function panic() external {
         _onlyStrategistOrOwner();
         ILpDepositor(LP_DEPOSITOR).withdraw(want, balanceOfPool());
-        uint wantBalance = IERC20Upgradeable(want).balanceOf(address(this));
-        IERC20Upgradeable(want).safeTransfer(vault, wantBalance);
         pause();
     }
 
