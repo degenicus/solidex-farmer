@@ -39,20 +39,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     address public constant SOLIDLY_ROUTER = 0xa38cd27185a464914D3046f0AB9d43356B34829D;
 
     /**
-     * @dev Routes we take to swap tokens
-     * {solidlyToWftmRoute} - Route we take to get from {SOLIDLY} into {WFTM}.
-     * {solidexToWftmRoute} - Route we take to get from {SOLIDEX} into {WFTM}.
-     * {wftmToWantRoute} - Route we take to get from {WFTM} into {want}.
-     * {wftmToLp0Route} - Route we take to get from {WFTM} into {lpToken0}.
-     * {wftmToLp1Route} - Route we take to get from {WFTM} into {lpToken1}.
-     */
-    address[] public solidlyToWftmRoute;
-    address[] public solidexToWftmRoute;
-    address[] public wftmToWantRoute;
-    address[] public wftmToLp0Route;
-    address[] public wftmToLp1Route;
-
-    /**
      * @dev Strategy variables
      * {isStable} - If the LP are stables (uses different swap)
     */
@@ -71,16 +57,8 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     ) public initializer {
         __ReaperBaseStrategy_init(_vault, _feeRemitters, _strategists);
         want = _want;
-        solidlyToWftmRoute = [SOLIDLY, WFTM];
-        solidexToWftmRoute = [SOLIDEX, WFTM];
-        
         (lpToken0, lpToken1) = IBaseV1Pair(want).tokens();
-
-        wftmToLp0Route = [WFTM, lpToken0];
-        wftmToLp1Route = [WFTM, lpToken1];
-
         isStable = _isStable;
-
         _giveAllowances();
     }
 
@@ -296,10 +274,10 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         }
 
         if (lpToken0 != WFTM) {
-            _swapTokens(wftmToLp0Route[0], wftmToLp0Route[1], wrappedHalf);
+            _swapTokens(lpToken0, WFTM, wrappedHalf);
         }
         if (lpToken1 != WFTM) {
-            _swapTokens(wftmToLp1Route[0], wftmToLp1Route[1], wrappedHalf);
+            _swapTokens(lpToken1, WFTM, wrappedHalf);
         }
 
         uint lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
