@@ -327,9 +327,9 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function _removeAllowances() internal {
         IERC20Upgradeable(want).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(want).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(SOLIDLY).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDLY).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(SOLIDEX).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(SOLIDEX).allowance(address(this), LP_DEPOSITOR));
-        IERC20Upgradeable(WFTM).safeDecreaseAllowance(LP_DEPOSITOR, IERC20Upgradeable(WFTM).allowance(address(this), LP_DEPOSITOR));
+        IERC20Upgradeable(SOLIDLY).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(SOLIDLY).allowance(address(this), SOLIDLY_ROUTER));
+        IERC20Upgradeable(SOLIDEX).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(SOLIDEX).allowance(address(this), SOLIDLY_ROUTER));
+        IERC20Upgradeable(WFTM).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(WFTM).allowance(address(this), SOLIDLY_ROUTER));
         IERC20Upgradeable(lpToken0).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER));
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(SOLIDLY_ROUTER, IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER));
     }
