@@ -4,6 +4,7 @@ import './abstract/ReaperBaseStrategy.sol';
 import './interfaces/ILpDepositor.sol';
 import './interfaces/IBaseV1Router01.sol';
 import './interfaces/IBaseV1Pair.sol';
+import './interfaces/IUniswapV2Router02.sol';
 import '@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol';
 
 pragma solidity 0.8.11;
@@ -37,6 +38,22 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     address public constant LP_DEPOSITOR = 0x26E1A0d851CF28E697870e1b7F053B605C8b060F;
     address public constant SOLIDLY_ROUTER = 0xa38cd27185a464914D3046f0AB9d43356B34829D;
+    address public constant SPOOKY_ROUTER = 0xF491e7B69E4244ad4002BC14e878a34207E38c29;
+
+    /**
+     * @dev Helpers
+     * {lpTokenToRouter} - get the router to use to swap wftm to lpToken
+     * {customModeEnabled} - Dictates how to swap wftm to the lpTokens
+     *                  False: Swap half for lpToken0,
+     *                          other half for lpToken1
+     *                  True: Swap all for one lpToken,
+     *                          then swap half of this lpToken for the other
+     * {relayToken} - Token to swap to first in custom mode
+     */
+    mapping(address => address) lpTokenToRouter;
+    bool customModeEnabled = false;
+    address public relayToken;
+    address[] public relayToFinalPath;
 
     /**
      * @dev Initializes the strategy. Sets parameters, saves routes, and gives allowances.
@@ -51,7 +68,27 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         __ReaperBaseStrategy_init(_vault, _feeRemitters, _strategists);
         want = _want;
         (lpToken0, lpToken1) = IBaseV1Pair(want).tokens();
+        lpTokenToRouter[lpToken0] = SOLIDLY_ROUTER;
+        lpTokenToRouter[lpToken1] = SOLIDLY_ROUTER;
+        relayToken = lpToken0;
         _giveAllowances();
+    }
+
+    function setLpTokenToRouter(address _lpToken, address _router) external {
+        _onlyStrategistOrOwner();
+        require(_router == SPOOKY_ROUTER || _router == SOLIDLY_ROUTER, "unknown router");
+        lpTokenToRouter[_lpToken] = _router;
+    }
+
+    function setCustomModeEnabled(bool mode) external {
+        _onlyStrategistOrOwner();
+        customModeEnabled = mode;
+    }
+
+    function setRelayToken(address _lpToken) external {
+        _onlyStrategistOrOwner();
+        require(_lpToken == lpToken0 || _lpToken == lpToken1, "unknown token");
+        relayToken = _lpToken;
     }
 
     /**
@@ -215,20 +252,27 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
      */
     function _swapRewardsToWftm() internal {
         uint256 solidlyBalance = IERC20Upgradeable(SOLIDLY).balanceOf(address(this));
-        _swapTokens(SOLIDLY, WFTM, solidlyBalance);
+        _swapTokens(SOLIDLY, WFTM, solidlyBalance, SOLIDLY_ROUTER);
         uint256 solidexBalance = IERC20Upgradeable(SOLIDEX).balanceOf(address(this));
-        _swapTokens(SOLIDEX, WFTM, solidexBalance);
+        _swapTokens(SOLIDEX, WFTM, solidexBalance, SOLIDLY_ROUTER);
     }
 
     function _swapTokens(
         address _from,
         address _to,
-        uint256 _amount
+        uint256 _amount,
+        address routerAddress
     ) internal {
         if (_amount != 0) {
-            IBaseV1Router01 router = IBaseV1Router01(SOLIDLY_ROUTER);
-            (uint256 output, bool stable) = router.getAmountOut(_amount, _from, _to);
-            router.swapExactTokensForTokensSimple(_amount, 0, _from, _to, stable, address(this), block.timestamp);
+            if (routerAddress == SOLIDLY_ROUTER) {
+                IBaseV1Router01 router = IBaseV1Router01(routerAddress);
+                (, bool stable) = router.getAmountOut(_amount, _from, _to);
+                router.swapExactTokensForTokensSimple(_amount, 0, _from, _to, stable, address(this), block.timestamp);
+            } else {
+                IUniswapV2Router02 router = IUniswapV2Router02(routerAddress);
+                relayToFinalPath = [_from, _to];
+                router.swapExactTokensForTokens(_amount, 0, relayToFinalPath, address(this), block.timestamp);
+            }
         }
     }
 
@@ -252,16 +296,10 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /** @dev Converts WFTM to both sides of the LP token and builds the liquidity pair */
     function _addLiquidity() internal {
-        uint256 wrappedHalf = IERC20Upgradeable(WFTM).balanceOf(address(this)) / 2;
-        if (wrappedHalf == 0) {
-            return;
-        }
-
-        if (lpToken0 != WFTM) {
-            _swapTokens(WFTM, lpToken0, wrappedHalf);
-        }
-        if (lpToken1 != WFTM) {
-            _swapTokens(WFTM, lpToken1, wrappedHalf);
+        if (!customModeEnabled) {
+            _addLiquidityDefault();
+        } else {
+            _addLiquidityCustom();
         }
 
         uint256 lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
@@ -280,6 +318,36 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         );
     }
 
+    function _addLiquidityDefault() internal {
+        uint256 wrappedHalf = IERC20Upgradeable(WFTM).balanceOf(address(this)) / 2;
+        if (wrappedHalf == 0) {
+            return;
+        }
+
+        if (lpToken0 != WFTM) {
+            _swapTokens(WFTM, lpToken0, wrappedHalf, lpTokenToRouter[lpToken0]);
+        }
+        if (lpToken1 != WFTM) {
+            _swapTokens(WFTM, lpToken1, wrappedHalf, lpTokenToRouter[lpToken1]);
+        }
+    }
+
+    function _addLiquidityCustom() internal {
+        uint256 wrappedBal = IERC20Upgradeable(WFTM).balanceOf(address(this));
+        if(wrappedBal == 0) {
+            return;
+        }
+
+        _swapTokens(WFTM, relayToken, wrappedBal, lpTokenToRouter[relayToken]);
+
+        uint256 relayTokenHalf = IERC20Upgradeable(relayToken).balanceOf(address(this)) / 2;
+        if (relayToken == lpToken0) {
+            _swapTokens(relayToken, lpToken1, relayTokenHalf, SOLIDLY_ROUTER);
+        } else {
+            _swapTokens(relayToken, lpToken0, relayTokenHalf, SOLIDLY_ROUTER);
+        }
+    }
+
     /**
      * @dev Gives the necessary allowances
      */
@@ -294,6 +362,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(SOLIDEX).safeIncreaseAllowance(SOLIDLY_ROUTER, solidexAllowance);
         uint256 wftmAllowance = type(uint256).max - IERC20Upgradeable(WFTM).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(WFTM).safeIncreaseAllowance(SOLIDLY_ROUTER, wftmAllowance);
+        IERC20Upgradeable(WFTM).safeIncreaseAllowance(SPOOKY_ROUTER, wftmAllowance);
         uint256 lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SOLIDLY_ROUTER, lp0Allowance);
         uint256 lp1Allowance = type(uint256).max - IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER);
