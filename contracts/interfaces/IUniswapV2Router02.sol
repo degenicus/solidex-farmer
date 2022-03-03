@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: agpl-3.0
+
 pragma solidity >=0.6.2;
 
 import './IUniswapV2Router01.sol';
