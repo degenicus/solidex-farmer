@@ -99,7 +99,7 @@ abstract contract ReaperBaseStrategy is
         __AccessControlEnumerable_init();
         __Pausable_init_unchained();
 
-        harvestLogCadence = 1 hours;
+        harvestLogCadence = 1 minutes;
         totalFee = 450;
         callFee = 1000;
         treasuryFee = 9000;
