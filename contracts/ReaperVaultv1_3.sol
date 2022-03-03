@@ -103,7 +103,7 @@ contract ReaperVaultv1_3 is ERC20, Ownable, ReentrancyGuard {
     function initialize(address _strategy) public onlyOwner returns (bool) {
         require(!initialized, "Contract is already initialized.");
         require(
-            block.timestamp <= (constructionTime + 1200),
+            block.timestamp <= (constructionTime + 3600),
             "initialization period over, use timelock"
         );
         strategy = _strategy;

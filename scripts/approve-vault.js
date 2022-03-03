@@ -1,12 +1,9 @@
 async function main() {
-  const vaultAddress = '0x5e071787abcA51fF64Dff517F0Fbbb73CF458DBE';
+  const vaultAddress = '0xc2Bc6EDaa1D002AbC74c6197b3e0F5b850269DBF';
   const ERC20 = await ethers.getContractFactory('contracts/ERC20.sol:ERC20');
-  //const fUSDTAddress = '0x049d68029688eabf473097a2fc38ef61633a3c7a';
-  const fraxAddress = '0xdc301622e621166bd8e82f2ca0a26c13ad0be355';
-  const erc20 = await ERC20.attach(fraxAddress);
+  const erc20 = await ERC20.attach('0x6B987e02Ca5eAE26D8B2bCAc724D4e03b3B0c295');
   const [deployer] = await ethers.getSigners();
-  console.log(await erc20.allowance(deployer.address, vaultAddress));
-  // await erc20.approve(vaultAddress, ethers.utils.parseEther('100'));
+  console.log(await erc20.balanceOf(deployer.address));
   // console.log('erc20 approved');
 }
 
