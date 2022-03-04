@@ -26,8 +26,7 @@ describe('Vaults', function () {
   const paymentSplitterAddress = '0x63cbd4134c2253041F370472c130e92daE4Ff174';
   let treasury;
   let want;
-  const ftmTombLPAddress = '0x60a861Cd30778678E3d613db96139440Bd333143';
-  const wantAddress = ftmTombLPAddress;
+  const wantAddress = '0x5804F6C40f44cF7593F73cf3aa16F7037213A623';
   let self;
   let wantWhale;
   let selfAddress;
@@ -42,7 +41,7 @@ describe('Vaults', function () {
         {
           forking: {
             jsonRpcUrl: 'https://rpc.ftm.tools/',
-            blockNumber: 31962239,
+            blockNumber: 32486234,
           },
         },
       ],
@@ -50,8 +49,8 @@ describe('Vaults', function () {
     console.log('providers');
     //get signers
     [owner, addr1, addr2, addr3, addr4, ...addrs] = await ethers.getSigners();
-    const wantHolder = '0xb0372391320b9a6316d39fe027952b5b1b10bd9d'; // ftm-tomb
-    const wantWhaleAddress = '0x6de4d784f6019aa9dc281b368023e403ea017601'; // ftm-tomb
+    const wantHolder = '0x5455108fd39520DFb63BaB4040f4EE362e135392'; // boo-xboo
+    const wantWhaleAddress = '0x73Ebe496670AC381a9C4ECC9602Bc61C76975A69'; // boo-xboo
     const strategistAddress = '0x3b410908e71Ee04e7dE2a87f8F9003AFe6c1c7cE';
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
@@ -102,7 +101,7 @@ describe('Vaults', function () {
     console.log('strategy');
     strategy = await hre.upgrades.deployProxy(
       Strategy,
-      [vault.address, [treasury.address, paymentSplitterAddress], [strategistAddress], wantAddress, isStable],
+      [vault.address, [treasury.address, paymentSplitterAddress], [strategistAddress]],
       { kind: 'uups' },
     );
     await strategy.deployed();
@@ -120,8 +119,8 @@ describe('Vaults', function () {
     await want.connect(wantWhale).approve(vault.address, ethers.utils.parseEther('1000000000'));
   });
 
-  describe('Deploying the vault and strategy', function () {
-    xit('should initiate vault with a 0 balance', async function () {
+  xdescribe('Deploying the vault and strategy', function () {
+    it('should initiate vault with a 0 balance', async function () {
       console.log(1);
       const totalBalance = await vault.balance();
       console.log(2);
@@ -188,10 +187,10 @@ describe('Vaults', function () {
       expect(selfWantBalance).to.equal(selfDepositAmount);
     });
 
-    xit('should allow withdrawals', async function () {
+    it('should allow withdrawals', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
-      const depositAmount = toWantUnit('100');
+      const depositAmount = toWantUnit('10');
       await vault.connect(self).deposit(depositAmount);
       console.log(`await want.balanceOf(selfAddress): ${await want.balanceOf(selfAddress)}`);
 
@@ -263,8 +262,8 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('should be able to harvest', async function () {
-      await vault.connect(self).deposit(toWantUnit('1000'));
+    it('should be able to harvest', async function () {
+      await vault.connect(self).deposit(toWantUnit('10'));
       const estimatedGas = await strategy.estimateGas.harvest();
       console.log(`estimatedGas: ${estimatedGas}`);
       await strategy.connect(self).harvest();
@@ -318,8 +317,8 @@ describe('Vaults', function () {
       expect(newVaultBalance).to.be.closeTo(vaultBalance, allowedImprecision);
     });
 
-    xit('should be able to retire strategy', async function () {
-      const depositAmount = toWantUnit('100');
+    it('should be able to retire strategy', async function () {
+      const depositAmount = toWantUnit('10');
       await vault.connect(self).deposit(depositAmount);
       const vaultBalance = await vault.balance();
       const strategyBalance = await strategy.balanceOf();
@@ -336,8 +335,8 @@ describe('Vaults', function () {
       await expect(strategy.retireStrat()).to.not.be.reverted;
     });
 
-    xit('should be able to estimate harvest', async function () {
-      const whaleDepositAmount = toWantUnit('1000');
+    it('should be able to estimate harvest', async function () {
+      const whaleDepositAmount = toWantUnit('100');
       await vault.connect(wantWhale).deposit(whaleDepositAmount);
       const minute = 60;
       const hour = 60 * minute;
