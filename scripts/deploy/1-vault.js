@@ -1,10 +1,10 @@
 async function main() {
   const Vault = await ethers.getContractFactory('ReaperVaultv1_3');
 
-  const ftmTombLPAddress = '0x60a861Cd30778678E3d613db96139440Bd333143';
-  const wantAddress = ftmTombLPAddress;
-  const tokenName = 'Solidex WFTM-TOMB Crypt';
-  const tokenSymbol = 'rfvAMM-WFTM-TOMB';
+  const usdcSynLPAddress = '0xB1b3B96cf35435b2518093acD50E02fe03A0131f';
+  const wantAddress = usdcSynLPAddress;
+  const tokenName = 'Solidex USDC-SYN Crypt';
+  const tokenSymbol = 'rfvAMM-USDC-SYN';
   const depositFee = 0;
   const tvlCap = ethers.utils.parseEther('2000');
 
