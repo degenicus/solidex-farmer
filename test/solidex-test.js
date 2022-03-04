@@ -119,7 +119,7 @@ describe('Vaults', function () {
     await want.connect(wantWhale).approve(vault.address, ethers.utils.parseEther('1000000000'));
   });
 
-  xdescribe('Deploying the vault and strategy', function () {
+  describe('Deploying the vault and strategy', function () {
     it('should initiate vault with a 0 balance', async function () {
       console.log(1);
       const totalBalance = await vault.balance();
@@ -136,7 +136,7 @@ describe('Vaults', function () {
     });
   });
   describe('Vault Tests', function () {
-    xit('should allow deposits and account for them correctly', async function () {
+    it('should allow deposits and account for them correctly', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const vaultBalance = await vault.balance();
@@ -152,7 +152,7 @@ describe('Vaults', function () {
       expect(depositAmount).to.be.closeTo(newVaultBalance, allowedInaccuracy);
     });
 
-    xit('should mint user their pool share', async function () {
+    it('should mint user their pool share', async function () {
       console.log('---------------------------------------------');
       const userBalance = await want.balanceOf(selfAddress);
       console.log(userBalance.toString());
@@ -209,7 +209,7 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('should allow small withdrawal', async function () {
+    it('should allow small withdrawal', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const depositAmount = toWantUnit('0.0000001');
@@ -236,7 +236,7 @@ describe('Vaults', function () {
       expect(isSmallBalanceDifference).to.equal(true);
     });
 
-    xit('should handle small deposit + withdraw', async function () {
+    it('should handle small deposit + withdraw', async function () {
       const userBalance = await want.balanceOf(selfAddress);
       console.log(`userBalance: ${userBalance}`);
       const depositAmount = toWantUnit('0.0000000000001');
@@ -269,7 +269,7 @@ describe('Vaults', function () {
       await strategy.connect(self).harvest();
     });
 
-    xit('should provide yield', async function () {
+    it('should provide yield', async function () {
       const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(selfAddress);
       console.log(initialUserBalance);
@@ -297,7 +297,7 @@ describe('Vaults', function () {
     });
   });
   describe('Strategy', function () {
-    xit('should be able to pause and unpause', async function () {
+    it('should be able to pause and unpause', async function () {
       await strategy.pause();
       const depositAmount = toWantUnit('1');
       await expect(vault.connect(self).deposit(depositAmount)).to.be.reverted;
@@ -305,7 +305,7 @@ describe('Vaults', function () {
       await expect(vault.connect(self).deposit(depositAmount)).to.not.be.reverted;
     });
 
-    xit('should be able to panic', async function () {
+    it('should be able to panic', async function () {
       const depositAmount = toWantUnit('0.0007');
       await vault.connect(self).deposit(depositAmount);
       const vaultBalance = await vault.balance();
@@ -331,7 +331,7 @@ describe('Vaults', function () {
       expect(newStrategyBalance).to.be.lt(allowedImprecision);
     });
 
-    xit('should be able to retire strategy with no balance', async function () {
+    it('should be able to retire strategy with no balance', async function () {
       await expect(strategy.retireStrat()).to.not.be.reverted;
     });
 
