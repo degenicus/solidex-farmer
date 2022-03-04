@@ -97,12 +97,10 @@ describe('Vaults', function () {
     console.log(`vault.address: ${vault.address}`);
     console.log(`treasury.address: ${treasury.address}`);
 
-    const isStable = false;
-
     console.log('strategy');
     strategy = await hre.upgrades.deployProxy(
       Strategy,
-      [vault.address, [treasury.address, paymentSplitterAddress], [strategistAddress], wantAddress, isStable],
+      [vault.address, [treasury.address, paymentSplitterAddress], [strategistAddress], wantAddress],
       { kind: 'uups' },
     );
     await strategy.deployed();
@@ -270,7 +268,7 @@ describe('Vaults', function () {
       await strategy.connect(self).harvest();
     });
 
-    xit('should provide yield', async function () {
+    it('should provide yield', async function () {
       const timeToSkip = 3600;
       const initialUserBalance = await want.balanceOf(selfAddress);
       console.log(initialUserBalance);

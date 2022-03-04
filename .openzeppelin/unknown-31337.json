@@ -3,14 +3,14 @@
   "proxies": [
     {
       "address": "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
-      "txHash": "0xfbc55982d677b7b857c38faeee237d9c77291e46182b062aaf3e91f165c1de87",
+      "txHash": "0x5c2469d7b3c5927d5dec6bd205245bebe06587c1faec67f8f907f2becdbbcb5e",
       "kind": "uups"
     }
   ],
   "impls": {
-    "4eeeeff003bd2a6ed88a83bf33614cc36530d2844f67a0f55f9634439ef146ed": {
+    "c9542612a54c2bdee2744827d1309eab11d65c0de21c2e9b26eaacf5191d0379": {
       "address": "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
-      "txHash": "0x69f725c30e9f406286e3bde13ff9e1b7951bd0482320560fd5a08db862e9e742",
+      "txHash": "0x1c72c55907740af460caa4c0e4345fdf959caf2452313edc6ba71522f1670af1",
       "layout": {
         "storage": [
           {
@@ -88,7 +88,7 @@
           {
             "contract": "ReaperBaseStrategy",
             "label": "harvestLog",
-            "type": "t_array(t_struct(Harvest)6842_storage)dyn_storage",
+            "type": "t_array(t_struct(Harvest)6971_storage)dyn_storage",
             "src": "contracts\\abstract\\ReaperBaseStrategy.sol:27"
           },
           {
@@ -161,38 +161,29 @@
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "want",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:29"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:30"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "lpToken0",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:30"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:31"
           },
           {
             "contract": "ReaperAutoCompoundSolidexFarmer",
             "label": "lpToken1",
             "type": "t_address",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:31"
-          },
-          {
-            "contract": "ReaperAutoCompoundSolidexFarmer",
-            "label": "isStable",
-            "type": "t_bool",
-            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:45"
+            "src": "contracts\\ReaperAutoCompoundSolidexFarmer.sol:32"
           }
         ],
         "types": {
           "t_address": {
             "label": "address"
           },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_array(t_struct(Harvest)6842_storage)dyn_storage": {
+          "t_array(t_struct(Harvest)6971_storage)dyn_storage": {
             "label": "struct ReaperBaseStrategy.Harvest[]"
           },
-          "t_struct(Harvest)6842_storage": {
+          "t_struct(Harvest)6971_storage": {
             "label": "struct ReaperBaseStrategy.Harvest",
             "members": [
               {
@@ -207,6 +198,9 @@
           },
           "t_uint256": {
             "label": "uint256"
+          },
+          "t_bool": {
+            "label": "bool"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
