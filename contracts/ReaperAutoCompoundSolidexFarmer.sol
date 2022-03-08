@@ -269,19 +269,16 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /** @dev Converts WFTM to both sides of the LP token and builds the liquidity pair */
     function _addLiquidity() internal {
-        uint256 wrappedHalf = IERC20Upgradeable(WFTM).balanceOf(address(this)) / 2;
-        if (wrappedHalf == 0) {
+        uint256 wrapped = IERC20Upgradeable(WFTM).balanceOf(address(this));
+        _swapTokens(WFTM, lpToken0, wrapped, SPOOKY_ROUTER);
+        uint256 lp0Half = IERC20Upgradeable(lpToken0).balanceOf(address(this)) / 2;
+
+        if (lp0Half == 0) {
             return;
         }
 
-        if (lpToken0 != WFTM) {
-            address router = _findBestRouterForSwap(WFTM, lpToken0, wrappedHalf);
-            _swapTokens(WFTM, lpToken0, wrappedHalf, router);
-        }
-        if (lpToken1 != WFTM) {
-            address router = _findBestRouterForSwap(WFTM, lpToken1, wrappedHalf);
-            _swapTokens(WFTM, lpToken1, wrappedHalf, router);
-        }
+        address router = _findBestRouterForSwap(lpToken0, lpToken1, lp0Half);
+        _swapTokens(lpToken0, lpToken1, lp0Half, router);
 
         uint256 lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint256 lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
