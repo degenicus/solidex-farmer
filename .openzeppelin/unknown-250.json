@@ -2,15 +2,30 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xDc0eCC1e151a6Fab216F169738a1e4ABf42f88c6",
-      "txHash": "0x362871470839413582f5884ef231ae5f04fc1a069c217495ef464b38c401bb7d",
+      "address": "0x40EaFc789138d50ceed862Bd8d7201884375d39e",
+      "txHash": "0x29ef125d3cc1e811aea8c5799e53f1640f4ff4a7f70eccc963fa6215d5f76eaa",
+      "kind": "uups"
+    },
+    {
+      "address": "0x0a9d6f7b0DaBC6A7eF56f1f70753415c1d88Aad9",
+      "txHash": "0x44a9095194be59116e71de770dfb832da9a079b27f16b5bec16c3d659cabc024",
+      "kind": "uups"
+    },
+    {
+      "address": "0xf89D9f1CEb93de74F3233dEbA1dB72f255d958ed",
+      "txHash": "0x47e2df98837563887ba672bd6fc96816d073cf52dfbbf4df74e20e364b099b7f",
+      "kind": "uups"
+    },
+    {
+      "address": "0x9b80A745e01989A49024B8EA754a57c1b374a279",
+      "txHash": "0x7203fbfc08bc23b4ace75bb911ded4d851d570fc4edac6dd369d4befbc47ed6c",
       "kind": "uups"
     }
   ],
   "impls": {
-    "3a1de259f5ca3ee7f6b99418268179325059b9ab6a590108f91d52f6d9c98664": {
-      "address": "0x87FdF6BB458715ba47732278a5DE024b6bE86Da8",
-      "txHash": "0x29a2a6d9d83e4b71a7cef8dad7d63157d9e56c9a33515dcc857333b5f1266c07",
+    "d5d93efdcda9ce0360dfdc43ec8cfa8fb1ef78083bdd08b3eda2680ad1a99831": {
+      "address": "0xF81f185203e0d7CddcB1159dc450Ed9142177D20",
+      "txHash": "0x74ca4a5b2d9ea07f2dd004d4e8468090b0662d73f10756295e9983e6b9e62d0b",
       "layout": {
         "storage": [
           {
@@ -88,7 +103,7 @@
           {
             "contract": "ReaperBaseStrategy",
             "label": "harvestLog",
-            "type": "t_array(t_struct(Harvest)6965_storage)dyn_storage",
+            "type": "t_array(t_struct(Harvest)7009_storage)dyn_storage",
             "src": "contracts\\abstract\\ReaperBaseStrategy.sol:27"
           },
           {
@@ -180,10 +195,10 @@
           "t_address": {
             "label": "address"
           },
-          "t_array(t_struct(Harvest)6965_storage)dyn_storage": {
+          "t_array(t_struct(Harvest)7009_storage)dyn_storage": {
             "label": "struct ReaperBaseStrategy.Harvest[]"
           },
-          "t_struct(Harvest)6965_storage": {
+          "t_struct(Harvest)7009_storage": {
             "label": "struct ReaperBaseStrategy.Harvest",
             "members": [
               {

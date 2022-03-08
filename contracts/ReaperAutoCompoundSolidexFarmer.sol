@@ -331,9 +331,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(WFTM).safeIncreaseAllowance(SOLIDLY_ROUTER, wftmAllowance);
         wftmAllowance = type(uint256).max - IERC20Upgradeable(WFTM).allowance(address(this), SPOOKY_ROUTER);
         IERC20Upgradeable(WFTM).safeIncreaseAllowance(SPOOKY_ROUTER, wftmAllowance);
-        // LP tokens -> SOLIDLY_ROUTER
+        // LP tokens -> SOLIDLY_ROUTER, SPOOKY_ROUTER
         uint256 lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SOLIDLY_ROUTER, lp0Allowance);
+        lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER);
+        IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SPOOKY_ROUTER, lp0Allowance);
         uint256 lp1Allowance = type(uint256).max - IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken1).safeIncreaseAllowance(SOLIDLY_ROUTER, lp1Allowance);
     }
@@ -365,6 +367,10 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
             IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER)
+        );
+        IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
+            SPOOKY_ROUTER,
+            IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER)
         );
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
