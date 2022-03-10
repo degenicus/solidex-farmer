@@ -1,12 +1,12 @@
 async function main() {
   const Vault = await ethers.getContractFactory('ReaperVaultv1_3');
 
-  const wantAddress = '0xD9A4108CBB40a12dE16dFFDc54aE5065878816d7';
-  const tokenName = 'USDC-WEVE Solidex Crypt';
-  const tokenSymbol = 'rfvAMM-USDC-WEVE';
+  const wantAddress = '0xa3bf7336FDbCe054c4B5Bad4FF8d79539dB2a2b3';
+  const tokenName = 'SOLID-OXSOLID Solidex Crypt';
+  const tokenSymbol = 'rfvAMM-SOLID-OXSOLID';
   const depositFee = 0;
   const tvlCap = ethers.utils.parseEther('2000');
-  const options = { gasPrice: 1000000000000, gasLimit: 9000000 };
+  const options = { gasPrice: 900000000000, gasLimit: 9000000 };
 
   const vault = await Vault.deploy(wantAddress, tokenName, tokenSymbol, depositFee, tvlCap, options);
 
