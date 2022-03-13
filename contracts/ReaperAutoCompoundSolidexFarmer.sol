@@ -27,6 +27,7 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     address public constant WFTM = 0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83;
     address public constant SOLIDLY = 0x888EF71766ca594DED1F0FA3AE64eD2941740A20;
     address public constant SOLIDEX = 0xD31Fcd1f7Ba190dBc75354046F6024A9b86014d7;
+    address public constant BRIDGE_TOKEN = 0x04068DA6C83AFCFA0e13ba15A6696662335D5B75;
     address public want;
     address public lpToken0;
     address public lpToken1;
@@ -269,19 +270,20 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
 
     /** @dev Converts WFTM to both sides of the LP token and builds the liquidity pair */
     function _addLiquidity() internal {
-        uint256 wrappedHalf = IERC20Upgradeable(WFTM).balanceOf(address(this)) / 2;
-        if (wrappedHalf == 0) {
+        uint256 wrapped = IERC20Upgradeable(WFTM).balanceOf(address(this));
+        if (wrapped == 0) {
             return;
         }
 
-        if (lpToken0 != WFTM) {
-            address router = _findBestRouterForSwap(WFTM, lpToken0, wrappedHalf);
-            _swapTokens(WFTM, lpToken0, wrappedHalf, router);
+        _swapTokens(WFTM, BRIDGE_TOKEN, wrapped, SPOOKY_ROUTER);
+        uint256 bridgeBalance = IERC20Upgradeable(BRIDGE_TOKEN).balanceOf(address(this));
+
+        if (lpToken0 != BRIDGE_TOKEN) {
+            address router = _findBestRouterForSwap(BRIDGE_TOKEN, lpToken0, bridgeBalance);
+            _swapTokens(BRIDGE_TOKEN, lpToken0, bridgeBalance, router);
         }
-        if (lpToken1 != WFTM) {
-            address router = _findBestRouterForSwap(WFTM, lpToken1, wrappedHalf);
-            _swapTokens(WFTM, lpToken1, wrappedHalf, router);
-        }
+        uint256 lp0Half = IERC20Upgradeable(lpToken0).balanceOf(address(this)) / 2;
+        _swapTokens(lpToken0, lpToken1, lp0Half, SOLIDLY_ROUTER);
 
         uint256 lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint256 lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
@@ -339,6 +341,12 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SOLIDLY_ROUTER, lp0Allowance);
         uint256 lp1Allowance = type(uint256).max - IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken1).safeIncreaseAllowance(SOLIDLY_ROUTER, lp1Allowance);
+
+        // BRIDGE_TOKEN -> SOLIDLY_ROUTER, SPOOKY_ROUTER
+        uint256 bridgeAllowance = type(uint256).max - IERC20Upgradeable(BRIDGE_TOKEN).allowance(address(this), SOLIDLY_ROUTER);
+        IERC20Upgradeable(BRIDGE_TOKEN).safeIncreaseAllowance(SOLIDLY_ROUTER, bridgeAllowance);
+        bridgeAllowance = type(uint256).max - IERC20Upgradeable(BRIDGE_TOKEN).allowance(address(this), SPOOKY_ROUTER);
+        IERC20Upgradeable(BRIDGE_TOKEN).safeIncreaseAllowance(SPOOKY_ROUTER, bridgeAllowance);
     }
 
     /**
@@ -372,6 +380,14 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
             IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER)
+        );
+        IERC20Upgradeable(BRIDGE_TOKEN).safeDecreaseAllowance(
+            SOLIDLY_ROUTER,
+            IERC20Upgradeable(BRIDGE_TOKEN).allowance(address(this), SOLIDLY_ROUTER)
+        );
+        IERC20Upgradeable(BRIDGE_TOKEN).safeDecreaseAllowance(
+            SPOOKY_ROUTER,
+            IERC20Upgradeable(BRIDGE_TOKEN).allowance(address(this), SPOOKY_ROUTER)
         );
     }
 }
