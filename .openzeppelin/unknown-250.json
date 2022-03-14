@@ -2,35 +2,15 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x40EaFc789138d50ceed862Bd8d7201884375d39e",
-      "txHash": "0x29ef125d3cc1e811aea8c5799e53f1640f4ff4a7f70eccc963fa6215d5f76eaa",
-      "kind": "uups"
-    },
-    {
-      "address": "0x0a9d6f7b0DaBC6A7eF56f1f70753415c1d88Aad9",
-      "txHash": "0x44a9095194be59116e71de770dfb832da9a079b27f16b5bec16c3d659cabc024",
-      "kind": "uups"
-    },
-    {
-      "address": "0xf89D9f1CEb93de74F3233dEbA1dB72f255d958ed",
-      "txHash": "0x47e2df98837563887ba672bd6fc96816d073cf52dfbbf4df74e20e364b099b7f",
-      "kind": "uups"
-    },
-    {
-      "address": "0x9b80A745e01989A49024B8EA754a57c1b374a279",
-      "txHash": "0x7203fbfc08bc23b4ace75bb911ded4d851d570fc4edac6dd369d4befbc47ed6c",
-      "kind": "uups"
-    },
-    {
-      "address": "0xA02C92F5cF566C807EDD9edda37669bdf4230D7B",
-      "txHash": "0x67f821c0b3be52707e2c06d8bcc7e0ab116ac14475b6d02e3c4c54c41e91873d",
+      "address": "0xc515392C35270A5d7bD9eeE15b55eD8a4b9F79E0",
+      "txHash": "0xb86d603a097f2ff25ea94234d72bf26b2ea2a5cbd283a8a520f90cdd04e052d2",
       "kind": "uups"
     }
   ],
   "impls": {
-    "d5d93efdcda9ce0360dfdc43ec8cfa8fb1ef78083bdd08b3eda2680ad1a99831": {
-      "address": "0xF81f185203e0d7CddcB1159dc450Ed9142177D20",
-      "txHash": "0x74ca4a5b2d9ea07f2dd004d4e8468090b0662d73f10756295e9983e6b9e62d0b",
+    "9f0a9e66539a61f9461ee9cbc2771c2fb1fd5811c1be4183b6d2d4517649a2fd": {
+      "address": "0xaAE2A95C6d1ae173642220ee9328cfcfeA169e95",
+      "txHash": "0xe1a34bfd37a94f50139d84a16d8fa1b08ea97b509afa0b019d37a4f5c6568956",
       "layout": {
         "storage": [
           {
@@ -108,7 +88,7 @@
           {
             "contract": "ReaperBaseStrategy",
             "label": "harvestLog",
-            "type": "t_array(t_struct(Harvest)7009_storage)dyn_storage",
+            "type": "t_array(t_struct(Harvest)6985_storage)dyn_storage",
             "src": "contracts\\abstract\\ReaperBaseStrategy.sol:27"
           },
           {
@@ -200,10 +180,10 @@
           "t_address": {
             "label": "address"
           },
-          "t_array(t_struct(Harvest)7009_storage)dyn_storage": {
+          "t_array(t_struct(Harvest)6985_storage)dyn_storage": {
             "label": "struct ReaperBaseStrategy.Harvest[]"
           },
-          "t_struct(Harvest)7009_storage": {
+          "t_struct(Harvest)6985_storage": {
             "label": "struct ReaperBaseStrategy.Harvest",
             "members": [
               {
