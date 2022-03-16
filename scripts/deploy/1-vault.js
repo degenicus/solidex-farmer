@@ -1,9 +1,9 @@
 async function main() {
   const Vault = await ethers.getContractFactory('ReaperVaultv1_3');
 
-  const wantAddress = '0x4FE782133af0f7604B9B89Bf95893ADDE265FEFD';
-  const tokenName = 'TAROT-XTAROT Solidex Crypt';
-  const tokenSymbol = 'rfvAMM-TAROT-XTAROT';
+  const wantAddress = '0x74b61f876FB49C7e73dBDd3B2185390BFDC11fF5';
+  const tokenName = 'SCREAM-XSCREAM Solidex Crypt';
+  const tokenSymbol = 'rfvAMM-SCREAM-XSCREAM';
   const depositFee = 0;
   const tvlCap = ethers.utils.parseEther('2000');
   const options = { gasPrice: 350000000000, gasLimit: 9000000 };
