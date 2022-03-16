@@ -271,15 +271,15 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
     /** @dev Converts WFTM to both sides of the LP token and builds the liquidity pair */
     function _addLiquidity() internal {
         uint256 wrapped = IERC20Upgradeable(WFTM).balanceOf(address(this));
-        _swapTokens(WFTM, lpToken0, wrapped, SPIRIT_ROUTER);
-        uint256 lp0Half = IERC20Upgradeable(lpToken0).balanceOf(address(this)) / 2;
 
-        if (lp0Half == 0) {
+        if (wrapped == 0) {
             return;
         }
 
-        address router = _findBestRouterForSwap(lpToken0, lpToken1, lp0Half);
-        _swapTokens(lpToken0, lpToken1, lp0Half, router);
+        _swapTokens(WFTM, lpToken0, wrapped, SPIRIT_ROUTER);
+        uint256 lp0Half = IERC20Upgradeable(lpToken0).balanceOf(address(this)) / 2;
+
+        _swapTokens(lpToken0, lpToken1, lp0Half, SOLIDLY_ROUTER);
 
         uint256 lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint256 lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
@@ -333,8 +333,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         // LP tokens -> SOLIDLY_ROUTER, SPOOKY_ROUTER
         uint256 lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SOLIDLY_ROUTER, lp0Allowance);
-        lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER);
-        IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SPOOKY_ROUTER, lp0Allowance);
         uint256 lp1Allowance = type(uint256).max - IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken1).safeIncreaseAllowance(SOLIDLY_ROUTER, lp1Allowance);
     }
@@ -356,20 +354,12 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
             IERC20Upgradeable(SOLIDEX).allowance(address(this), SOLIDLY_ROUTER)
         );
         IERC20Upgradeable(WFTM).safeDecreaseAllowance(
-            SOLIDLY_ROUTER,
-            IERC20Upgradeable(WFTM).allowance(address(this), SOLIDLY_ROUTER)
-        );
-        IERC20Upgradeable(WFTM).safeDecreaseAllowance(
-            SPOOKY_ROUTER,
-            IERC20Upgradeable(WFTM).allowance(address(this), SPOOKY_ROUTER)
+            SPIRIT_ROUTER,
+            IERC20Upgradeable(WFTM).allowance(address(this), SPIRIT_ROUTER)
         );
         IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
             IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER)
-        );
-        IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
-            SPOOKY_ROUTER,
-            IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER)
         );
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
