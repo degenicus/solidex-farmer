@@ -275,11 +275,11 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
             return;
         }
 
-        address router = _findBestRouterForSwap(WFTM, lpToken1, wrapped);
-        _swapTokens(WFTM, lpToken1, wrapped, router);
+        address router = _findBestRouterForSwap(WFTM, lpToken0, wrapped);
+        _swapTokens(WFTM, lpToken0, wrapped, router);
 
-        uint256 lp1Half = IERC20Upgradeable(lpToken1).balanceOf(address(this)) / 2;
-        _swapTokens(lpToken1, lpToken0, lp1Half, SOLIDLY_ROUTER);
+        uint256 lp0Half = IERC20Upgradeable(lpToken0).balanceOf(address(this)) / 2;
+        _swapTokens(lpToken0, lpToken1, lp0Half, SOLIDLY_ROUTER);
 
         uint256 lp0Bal = IERC20Upgradeable(lpToken0).balanceOf(address(this));
         uint256 lp1Bal = IERC20Upgradeable(lpToken1).balanceOf(address(this));
@@ -335,8 +335,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         // LP tokens -> SOLIDLY_ROUTER, SPOOKY_ROUTER
         uint256 lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SOLIDLY_ROUTER, lp0Allowance);
-        lp0Allowance = type(uint256).max - IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER);
-        IERC20Upgradeable(lpToken0).safeIncreaseAllowance(SPOOKY_ROUTER, lp0Allowance);
         uint256 lp1Allowance = type(uint256).max - IERC20Upgradeable(lpToken1).allowance(address(this), SOLIDLY_ROUTER);
         IERC20Upgradeable(lpToken1).safeIncreaseAllowance(SOLIDLY_ROUTER, lp1Allowance);
     }
@@ -368,10 +366,6 @@ contract ReaperAutoCompoundSolidexFarmer is ReaperBaseStrategy {
         IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
             IERC20Upgradeable(lpToken0).allowance(address(this), SOLIDLY_ROUTER)
-        );
-        IERC20Upgradeable(lpToken0).safeDecreaseAllowance(
-            SPOOKY_ROUTER,
-            IERC20Upgradeable(lpToken0).allowance(address(this), SPOOKY_ROUTER)
         );
         IERC20Upgradeable(lpToken1).safeDecreaseAllowance(
             SOLIDLY_ROUTER,
