@@ -2,15 +2,15 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xc515392C35270A5d7bD9eeE15b55eD8a4b9F79E0",
-      "txHash": "0xb86d603a097f2ff25ea94234d72bf26b2ea2a5cbd283a8a520f90cdd04e052d2",
+      "address": "0x4d37e3901C656adC24c89c2C08e078d9f188201F",
+      "txHash": "0xc1a17cc8a9a52ee9e0d84ae564eb618033b8ea0f1ddb7fd4e25575b52b700324",
       "kind": "uups"
     }
   ],
   "impls": {
-    "9f0a9e66539a61f9461ee9cbc2771c2fb1fd5811c1be4183b6d2d4517649a2fd": {
-      "address": "0xaAE2A95C6d1ae173642220ee9328cfcfeA169e95",
-      "txHash": "0xe1a34bfd37a94f50139d84a16d8fa1b08ea97b509afa0b019d37a4f5c6568956",
+    "bd499b874102d2a457d354eca12c61819f59407ef3d5422e784ecf85832b9bcf": {
+      "address": "0x48E65a9e5aaDaBC4940a8C6082CBF60A47211584",
+      "txHash": "0xacf2071e2bb8400d39f9517effb8cb6cac0cedb7d90da679313f03186096ce4b",
       "layout": {
         "storage": [
           {
@@ -88,7 +88,7 @@
           {
             "contract": "ReaperBaseStrategy",
             "label": "harvestLog",
-            "type": "t_array(t_struct(Harvest)6985_storage)dyn_storage",
+            "type": "t_array(t_struct(Harvest)6916_storage)dyn_storage",
             "src": "contracts\\abstract\\ReaperBaseStrategy.sol:27"
           },
           {
@@ -180,10 +180,10 @@
           "t_address": {
             "label": "address"
           },
-          "t_array(t_struct(Harvest)6985_storage)dyn_storage": {
+          "t_array(t_struct(Harvest)6916_storage)dyn_storage": {
             "label": "struct ReaperBaseStrategy.Harvest[]"
           },
-          "t_struct(Harvest)6985_storage": {
+          "t_struct(Harvest)6916_storage": {
             "label": "struct ReaperBaseStrategy.Harvest",
             "members": [
               {
